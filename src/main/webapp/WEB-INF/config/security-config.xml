@@ -5,7 +5,9 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
-
+	
+	<ldap-server ldif="classpath:users.ldif" />
+	
 	<http auto-config="true" use-expressions="true">
 		<intercept-url pattern="/login.html" access="permitAll"/>
 		<intercept-url pattern="/loginFailed.html" access="permitAll"/>
@@ -17,11 +19,21 @@
 		<access-denied-handler error-page="/403.html"/>
 	</http>
 
+	<!--  
 	<authentication-manager>
 		<authentication-provider>
 		<password-encoder hash="bcrypt"/>
 			<jdbc-user-service data-source-ref="dataSource"/>
 		</authentication-provider>
+	</authentication-manager>
+	-->
+
+	<authentication-manager>
+		<ldap-authentication-provider 
+			group-search-filter="member={0}"
+			group-search-base="ou=groups"
+			user-search-base="ou=people"
+			user-search-filter="uid={0}" />
 	</authentication-manager>
 
 	<beans:bean id="dataSource"
